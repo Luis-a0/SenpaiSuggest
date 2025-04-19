@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ anime['title'] }} - SenpaiSuggest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <h1><i class="fas fa-tv"></i> SenpaiSuggest</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Inicio</a></li>
+                <li><a href="{{ url_for('index') }}#about">Acerca de</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="anime-details-page">
+        <div class="search-bar">
+            <form action="{{ url_for('search') }}" method="post">
+                <input type="text" name="query" placeholder="Busca un anime..." required>
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+
+        <section class="anime-details">
+            <div class="anime-header">
+                <div class="anime-poster">
+                    <img src="{{ anime['image_url'] }}" alt="{{ anime['title'] }}">
+                </div>
+                <div class="anime-header-info">
+                    <h1>{{ anime['title'] }}</h1>
+                    
+                    <div class="anime-meta">
+                        {% if anime['year'] %}
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i> {{ anime['year'] }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if anime['episodes'] %}
+                        <div class="meta-item">
+                            <i class="fas fa-film"></i> {{ anime['episodes'] }} episodios
+                        </div>
+                        {% endif %}
+                        
+                        {% if anime['score'] %}
+                        <div class="meta-item">
+                            <i class="fas fa-star"></i> {{ anime['score'] }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if anime['rating'] %}
+                        <div class="meta-item">
+                            <i class="fas fa-users"></i> {{ anime['rating'] }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="anime-genres">
+                        {% for genre in anime['genres'] %}
+                            <a href="{{ url_for('recommend', genres=genre) }}" class="genre-tag">{{ genre }}</a>
+                        {% endfor %}
+                    </div>
+                    
+                    {% if anime['studios'] %}
+                    <div class="anime-studios">
+                        <h3>Estudios:</h3>
+                        <p>{{ anime['studios']|join(', ') }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if anime['themes'] %}
+                    <div class="anime-themes">
+                        <h3>Temas:</h3>
+                        <div class="theme-tags">
+                            {% for theme in anime['themes'] %}
+                                <span class="theme-tag">{{ theme }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="anime-synopsis">
+                <h2>Sinopsis</h2>
+                <p>{{ anime['synopsis'] }}</p>
+            </div>
+        </section>
+        
+        <section class="recommendations">
+            <h2>Animes similares que te podrían gustar</h2>
+            
+            {% if recommendations %}
+                <div class="anime-grid">
+                    {% for rec in recommendations %}
+                        <div class="anime-card">
+                            <a href="{{ url_for('anime_details', anime_id=rec['id']) }}">
+                                <div class="anime-image">
+                                    <img src="{{ rec['image_url'] }}" alt="{{ rec['title'] }}">
+                                    <div class="anime-score">
+                                        <i class="fas fa-star"></i> {{ rec['score'] if rec['score'] else 'N/A' }}
+                                    </div>
+                                </div>
+                                <div class="anime-info">
+                                    <h3>{{ rec['title'] }}</h3>
+                                    <div class="anime-genres">
+                                        {% for genre in rec['genres'][:3] %}
+                                            <span class="genre-tag">{{ genre }}</span>
+                                        {% endfor %}
+                                        {% if rec['genres']|length > 3 %}
+                                            <span class="genre-tag">+{{ rec['genres']|length - 3 }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-results">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>No se encontraron recomendaciones</h3>
+                    <p>Este anime parece ser bastante único en su género.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 SenpaiSuggest - Todos los derechos reservados</p>
+    </footer>
+</body>
+</html>

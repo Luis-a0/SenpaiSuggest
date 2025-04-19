@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados - SenpaiSuggest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <h1><i class="fas fa-tv"></i> SenpaiSuggest</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Inicio</a></li>
+                <li><a href="{{ url_for('index') }}#about">Acerca de</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="results-page">
+        <div class="search-bar">
+            <form action="{{ url_for('search') }}" method="post">
+                <input type="text" name="query" placeholder="Busca un anime..." value="{{ query if 'Géneros:' not in query and 'Animes del año' not in query else '' }}" required>
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+        </div>
+
+        <section class="results-container">
+            <h2>
+                {% if type == 'search' %}
+                Resultados para: "{{ query }}"
+                {% elif type == 'recommendation' %}
+                {{ query }}
+                {% elif type == 'year' %}
+                {{ query }}
+                {% else %}
+                Resultados
+                {% endif %}
+            </h2>
+
+            {% if results %}
+                <div class="anime-grid">
+                    {% for anime in results %}
+                        <div class="anime-card">
+                            <a href="{{ url_for('anime_details', anime_id=anime['id']) }}">
+                                <div class="anime-image">
+                                    <img src="{{ anime['image_url'] }}" alt="{{ anime['title'] }}">
+                                    <div class="anime-score">
+                                        <i class="fas fa-star"></i> {{ anime['score'] if anime['score'] else 'N/A' }}
+                                    </div>
+                                </div>
+                                <div class="anime-info">
+                                    <h3>{{ anime['title'] }}</h3>
+                                    <div class="anime-genres">
+                                        {% for genre in anime['genres'][:3] %}
+                                            <span class="genre-tag">{{ genre }}</span>
+                                        {% endfor %}
+                                        {% if anime['genres']|length > 3 %}
+                                            <span class="genre-tag">+{{ anime['genres']|length - 3 }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-results">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>No se encontraron resultados</h3>
+                    <p>Intenta con otra búsqueda o explora las recomendaciones en la página principal.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 SenpaiSuggest - Todos los derechos reservados</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SenpaiSuggest - Recomendador Inteligente de Anime</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <h1><i class="fas fa-tv"></i> SenpaiSuggest</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Inicio</a></li>
+                <li><a href="#about">Acerca de</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Descubre tu próximo anime favorito</h2>
+            <p>Encuentra recomendaciones personalizadas basadas en tus gustos</p>
+            
+            <div class="search-container">
+                <form action="{{ url_for('search') }}" method="post">
+                    <input type="text" name="query" placeholder="Busca un anime..." required>
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <i class="fas fa-filter"></i>
+                <h3>Busca por género</h3>
+                <p>Encuentra animes según tus géneros favoritos</p>
+                <div class="genre-selection">
+                    <form action="{{ url_for('recommend') }}" method="get" id="genreForm">
+                        <div class="genre-options" id="genreOptions">
+                            <!-- Se llenará con JavaScript -->
+                        </div>
+                        <button type="submit">Recomendar</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <i class="fas fa-calendar"></i>
+                <h3>Explora por año</h3>
+                <p>Descubre los mejores animes de cada temporada</p>
+                <div class="year-selection">
+                    <form action="{{ url_for('anime_by_year', year=2023) }}" method="get" id="yearForm">
+                        <select name="year" id="yearSelect">
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                            <option value="2019">2019</option>
+                            <option value="2018">2018</option>
+                            <option value="2017">2017</option>
+                            <option value="2016">2016</option>
+                            <option value="2015">2015</option>
+                            <option value="2010">2010</option>
+                            <option value="2000">2000</option>
+                            <option value="1990">1990</option>
+                        </select>
+                        <button type="submit">Ver animes</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <h2>Acerca de SenpaiSuggest</h2>
+            <p>SenpaiSuggest es un buscador inteligente de recomendaciones de anime que utiliza algoritmos avanzados para encontrar series que coincidan con tus preferencias. Nuestro sistema analiza géneros, temas, estudios y más para ofrecerte las mejores sugerencias personalizadas.</p>
+            <p>Desarrollado con Python y tecnologías de aprendizaje automático, SenpaiSuggest te ayuda a descubrir nuevos animes que seguramente disfrutarás.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 SenpaiSuggest - Todos los derechos reservados</p>
+    </footer>
+
+    <script>
+        // Cargar géneros populares
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/popular_genres');
+                const genres = await response.json();
+                
+                const genreOptions = document.getElementById('genreOptions');
+                
+                // Mostrar los 12 géneros más populares
+                const topGenres = Object.keys(genres).slice(0, 12);
+                
+                topGenres.forEach(genre => {
+                    const label = document.createElement('label');
+                    label.className = 'genre-checkbox';
+                    
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.name = 'genres';
+                    input.value = genre;
+                    
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(genre));
+                    
+                    genreOptions.appendChild(label);
+                });
+            } catch (error) {
+                console.error('Error al cargar géneros:', error);
+            }
+        });
+
+        // Actualizar URL al seleccionar un año
+        document.getElementById('yearSelect').addEventListener('change', function() {
+            const year = this.value;
+            document.getElementById('yearForm').action = `/year/${year}`;
+        });
+    </script>
+</body>
+</html>
